@@ -143,7 +143,7 @@ export default class EasyFit {
       fitObj.laps = laps;
       fitObj.records = records;
       fitObj.events = events;
-      fitObj.fieldDescriptions = fieldDescriptions;
+      fitObj.field_descriptions = fieldDescriptions;
     }
 
     callback(null, fitObj);

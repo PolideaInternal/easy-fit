@@ -270,14 +270,19 @@ function readRecord(blob, messageTypes, developerFields, startIndex, options, st
         var data = readData(blob, _fDef2, readDataFromIndex);
 
         if (!isInvalidValue(data, _fDef2.type)) {
-            var _message$getAttribute2 = message.getAttributes(_fDef2.fDefNo),
-                field = _message$getAttribute2.field,
-                type = _message$getAttribute2.type,
-                scale = _message$getAttribute2.scale,
-                offset = _message$getAttribute2.offset;
+            if (_fDef2.isDeveloperField) {
+                // Skip format of data if developer field
+                fields[_fDef2.name] = data;
+            } else {
+                var _message$getAttribute2 = message.getAttributes(_fDef2.fDefNo),
+                    field = _message$getAttribute2.field,
+                    type = _message$getAttribute2.type,
+                    scale = _message$getAttribute2.scale,
+                    offset = _message$getAttribute2.offset;
 
-            if (field !== 'unknown' && field !== '' && field !== undefined) {
-                fields[field] = applyOptions(formatByType(data, type, scale, offset), field, options);
+                if (field !== 'unknown' && field !== '' && field !== undefined) {
+                    fields[field] = applyOptions(formatByType(data, type, scale, offset), field, options);
+                }
             }
 
             if (message.name === 'record' && options.elapsedRecordField) {

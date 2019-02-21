@@ -141,16 +141,9 @@ var EasyFit = function () {
           case 'field_description':
             fieldDescriptions.push(message);
             break;
-          case '':
-            unnamed.push(message);
-            break;
           default:
             if (messageType !== '') {
-              if (fitObj[messageType != null]) {
-                fitObj[messageType].push(message);
-              } else {
-                fitObj[messageType] = [message];
-              }
+              fitObj[messageType] = message;
             }
             break;
         }

@@ -234,15 +234,10 @@ export function readRecord(blob, messageTypes, developerFields, startIndex, opti
         const data = readData(blob, fDef, readDataFromIndex);
 
         if (!isInvalidValue(data, fDef.type)) {
-            if (fDef.isDeveloperField) {
-                // Skip format of data if developer field
-                fields[fDef.name] = data;
-            } else {
-                const { field, type, scale, offset } = message.getAttributes(fDef.fDefNo);
+            const { field, type, scale, offset } = message.getAttributes(fDef.fDefNo);
 
-                if (field !== 'unknown' && field !== '' && field !== undefined) {
-                    fields[field] = applyOptions(formatByType(data, type, scale, offset), field, options);
-                }
+            if (field !== 'unknown' && field !== '' && field !== undefined) {
+                fields[field] = applyOptions(formatByType(data, type, scale, offset), field, options);
             }
 
             if (message.name === 'record' && options.elapsedRecordField) {

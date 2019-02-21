@@ -71,6 +71,7 @@ export default class EasyFit {
     const records = [];
     const events = [];
     const fieldDescriptions = [];
+    const unnamed = [];
 
     let tempLaps = [];
     let tempRecords = [];
@@ -122,6 +123,9 @@ export default class EasyFit {
         case 'field_description':
           fieldDescriptions.push(message);
           break;
+        case '':
+          unnamed.push(message);
+          break;
         default:
           if (messageType !== '') {
             if (fitObj[messageType != null]) {
@@ -144,6 +148,7 @@ export default class EasyFit {
       fitObj.records = records;
       fitObj.events = events;
       fitObj.field_descriptions = fieldDescriptions;
+      fitObj.unnamed = unnamed;
     }
 
     callback(null, fitObj);

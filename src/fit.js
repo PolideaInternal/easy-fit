@@ -653,7 +653,7 @@ export const FIT = {
     207: {
       name: 'developer_data_id',
       0: { field: 'developer_id', type: 'uint8', scale: null, offset: 0, units: '' },
-      1: { field: 'application_id', type: 'uint8', scale: null, offset: 0, units: '' },
+      1: { field: 'application_id', type: 'byte_array', scale: null, offset: 0, units: '' },
       2: { field: 'manufacturer_id', type: 'manufacturer', scale: null, offset: 0, units: '' },
       3: { field: 'developer_data_index', type: 'uint8', scale: null, offset: 0, units: '' },
       4: { field: 'application_version', type: 'uint8', scale: null, offset: 0, units: '' }

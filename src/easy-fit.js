@@ -147,8 +147,8 @@ export default class EasyFit {
       fitObj.laps = laps;
       fitObj.records = records;
       fitObj.events = events;
-      fitObj.devices = devices;
-      fitObj.applications = applications;
+      fitObj.device_infos = devices;
+      fitObj.developer_data_ids = applications;
       fitObj.field_descriptions = fieldDescriptions;
     }
 

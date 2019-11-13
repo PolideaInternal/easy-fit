@@ -10,11 +10,11 @@ var _binary = require('./binary');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var EasyFit = function () {
-  function EasyFit() {
+var FitParser = function () {
+  function FitParser() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    _classCallCheck(this, EasyFit);
+    _classCallCheck(this, FitParser);
 
     this.options = {
       force: options.force != null ? options.force : true,
@@ -26,7 +26,7 @@ var EasyFit = function () {
     };
   }
 
-  _createClass(EasyFit, [{
+  _createClass(FitParser, [{
     key: 'parse',
     value: function parse(content, callback) {
       var blob = new Uint8Array((0, _binary.getArrayBuffer)(content));
@@ -86,9 +86,12 @@ var EasyFit = function () {
       var laps = [];
       var records = [];
       var events = [];
+      var hrv = [];
       var devices = [];
       var applications = [];
       var fieldDescriptions = [];
+      var dive_gases = [];
+      var course_points = [];
 
       var tempLaps = [];
       var tempRecords = [];
@@ -100,10 +103,12 @@ var EasyFit = function () {
       var isModeCascade = this.options.mode === 'cascade';
       var isCascadeNeeded = isModeCascade || this.options.mode === 'both';
 
-      var startDate = void 0;
+      var startDate = void 0,
+          lastStopTimestamp = void 0;
+      var pausedTime = 0;
 
       while (loopIndex < crcStart) {
-        var _readRecord = (0, _binary.readRecord)(blob, messageTypes, developerFields, loopIndex, this.options, startDate),
+        var _readRecord = (0, _binary.readRecord)(blob, messageTypes, developerFields, loopIndex, this.options, startDate, pausedTime),
             nextIndex = _readRecord.nextIndex,
             messageType = _readRecord.messageType,
             message = _readRecord.message;
@@ -127,12 +132,23 @@ var EasyFit = function () {
             sessions.push(message);
             break;
           case 'event':
+            if (message.event === 'timer') {
+              if (message.event_type === 'stop_all') {
+                lastStopTimestamp = message.timestamp;
+              } else if (message.event_type === 'start' && lastStopTimestamp) {
+                pausedTime += (message.timestamp - lastStopTimestamp) / 1000;
+              }
+            }
             events.push(message);
+            break;
+          case 'hrv':
+            hrv.push(message);
             break;
           case 'record':
             if (!startDate) {
               startDate = message.timestamp;
               message.elapsed_time = 0;
+              message.timer_time = 0;
             }
             records.push(message);
             if (isCascadeNeeded) {
@@ -148,6 +164,12 @@ var EasyFit = function () {
           case 'developer_data_id':
             applications.push(message);
             break;
+          case 'dive_gas':
+            dive_gases.push(message);
+            break;
+          case 'course_point':
+            course_points.push(message);
+            break;
           default:
             if (messageType !== '') {
               fitObj[messageType] = message;
@@ -157,8 +179,10 @@ var EasyFit = function () {
       }
 
       if (isCascadeNeeded) {
+        fitObj.activity = fitObj.activity || {};
         fitObj.activity.sessions = sessions;
         fitObj.activity.events = events;
+        fitObj.activity.hrv = hrv;
       }
       if (!isModeCascade) {
         fitObj.sessions = sessions;
@@ -168,13 +192,16 @@ var EasyFit = function () {
         fitObj.device_infos = devices;
         fitObj.developer_data_ids = applications;
         fitObj.field_descriptions = fieldDescriptions;
+        fitObj.hrv = hrv;
+        fitObj.dive_gases = dive_gases;
+        fitObj.course_points = course_points;
       }
 
       callback(null, fitObj);
     }
   }]);
 
-  return EasyFit;
+  return FitParser;
 }();
 
-exports.default = EasyFit;
+exports.default = FitParser;

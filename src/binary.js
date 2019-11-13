@@ -337,6 +337,8 @@ export function readRecord(blob, messageTypes, developerFields, startIndex, opti
     }
 
     if (message.name === 'field_description') {
+        // Developer data fields may not be unique. Append with data index.
+        fields.field_name = `${fields.field_name}_${fields.developer_data_index}`;
         developerFields[fields.developer_data_index] = developerFields[fields.developer_data_index] || [];
         developerFields[fields.developer_data_index][fields.field_definition_number] = fields;
     }
